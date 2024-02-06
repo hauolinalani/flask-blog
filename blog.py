@@ -67,20 +67,8 @@ class Posts(db.Model):
     def __repr__(self):
         return '<sno {}>'.format(self.sno)
 
-
-"""
-heroku run python
->>> from app import db
->>> db.create_all()
->>> db.session.commit()
-"""
-
-
-# if not params['local_server']:
 db.create_all()
 db.session.commit()
-# app.logger.info('Tables have been created!')
-
 
 @app.route('/')
 def home():
@@ -91,13 +79,11 @@ def home():
         page = 1
 
     page = int(page)
-    posts = posts[(page - 1) * int(params['no_of_posts']): (page - 1) * int(params['no_of_posts']) + int(
-        params['no_of_posts'])]
+    posts = posts[(page - 1) * int(params['no_of_posts']): (page - 1) * int(params['no_of_posts']) + int(params['no_of_posts'])]
 
     if page == 1:
         prev = "#"
         next = '/?page=' + str(page + 1)
-
     elif page == last:
         next = "#"
         prev = '/?page=' + str(page - 1)
@@ -107,11 +93,9 @@ def home():
 
     return render_template('index.html', params=params, posts=posts, prev=prev, next=next)
 
-
 @app.route('/about')
 def about():
     return render_template('about.html', params=params)
-
 
 @app.route('/edit/<string:sno>', methods=['GET', 'POST'])
 def edit(sno):
@@ -144,7 +128,6 @@ def edit(sno):
         post = Posts.query.filter_by(sno=sno).first()
         return render_template('edit.html', params=params, post=post, sno=sno)
 
-
 @app.route('/dashboard', methods=['GET', 'POST'])
 def dashboard():
     if 'user' in session and session['user'] == params['admin_user']:
@@ -159,9 +142,7 @@ def dashboard():
             session['user'] = username
             posts = Posts.query.all()
             return render_template('dashboard.html', params=params, posts=posts)
-
     return render_template('login.html', params=params)
-
 
 @app.route('/uploader', methods=['GET', 'POST'])
 def uploader():
@@ -171,12 +152,10 @@ def uploader():
             f.save(os.path.join(app.config['UPLOAD_FOLDER'], secure_filename(f.filename)))
             return "Uploaded successfully!!"
 
-
 @app.route('/logout', methods=['GET'])
 def logout():
     session.pop('user')
     return redirect('/dashboard')
-
 
 @app.route('/delete/<string:sno>', methods=['GET', 'POST'])
 def delete(sno):
@@ -185,7 +164,6 @@ def delete(sno):
         db.session.delete(post)
         db.session.commit()
     return redirect('/dashboard')
-
 
 @app.route('/contact', methods=['GET', 'POST'])
 def contact():
@@ -201,13 +179,12 @@ def contact():
         db.session.commit()
     return render_template('contact.html', params=params)
 
-
 @app.route('/post/<string:post_slug>', methods=['GET'])
 def post_route(post_slug):
     # fetch post from db
     post = Posts.query.filter_by(slug=post_slug).first()
     return render_template('post.html', params=params, post=post)
 
-
 if __name__ == "__main__":
     app.run()
+
